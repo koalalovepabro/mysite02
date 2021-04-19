@@ -1,0 +1,80 @@
+{% extends "../base.html" %}
+
+{% load mathfilters %}
+
+{% block css_link %}
+<link href="/assets/css/board.css" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+			<div id="board">
+				<form id="search_form" action="" method="post">
+					<input type="text" id="kwd" name="kwd" value="">
+					<input type="submit" value="찾기">
+				</form>
+				<table class="tbl-ex">
+					<tr>
+						<th>번호</th>
+						<th>제목</th>
+						<th>글쓴이</th>
+						<th>조회수</th>
+						<th>작성일</th>
+						<th>&nbsp;</th>
+					</tr>
+					{% for data in boardlist %}
+					<tr>
+						<!--
+						<td>{{ boardlist.count | sub:forloop.counter | add:1 }}</td>
+						-->
+						<td>{{ data.index }}</td>
+						<td><a href="/board/view?id={{ data.board.id }}">{{ data.board.title }}</a></td>
+						<td>{{ data.board.user.name }}</td>
+						<td>{{ data.board.hit }}</td>
+						<td>{{ data.board.regdate }}</td>
+						<td>
+							{% if request.session.authuser is not None and request.session.authuser.id == data.board.user.id %}
+							<a href="/board/delete?id={{ data.board.id }}" class="del">삭제</a>
+							{% endif %}
+						</td>
+					</tr>
+					{% endfor %}
+				</table>
+
+				<!-- pager 추가 -->
+				<div class="pager">
+					<ul>
+						{% if prevpage > 0 %}
+						<li><a href="/board?p={{ prevpage }}">◀</a></li>
+						{% endif %}
+
+						{% for page in range %}
+							{% if endpage < page %}
+							{{ page }}
+							{% elif page == currentpage %}
+							<li class='selected'>{{ page }}</li>
+							{% else %}
+							<li><a href="/board?p={{ page }}">{{ page }}</a></li>
+							{% endif %}
+						{% endfor %}
+
+						<!--
+						<li class="selected">2</li>
+						<li><a href="">3</a></li>
+						<li>4</li>
+						<li>5</li>
+						-->
+
+						{% if nextpage > 0 %}
+						<li><a href="/board?p={{ nextpage }}">▶</a></li>
+						{% endif %}
+					</ul>
+				</div>
+				<!-- pager 추가 -->
+
+				{% if request.session.authuser is not None %}
+				<div class="bottom">
+					<a href="/board/write" id="new-book">글쓰기</a>
+				</div>
+				{% endif %}
+			</div>
+{% endblock %}
